@@ -1,0 +1,379 @@
+@import "tailwindcss";
+
+/* ── DA alignée sur le portfolio (D:\Works\perso\portfolio\src\app\globals.css).
+   Sombre uniquement. Valeurs miroirs de src/lib/theme.ts (tests/theme.test.ts
+   vérifie qu'elles restent identiques). ─────────────────────────────────── */
+:root {
+  color-scheme: dark;
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-card: #141420;
+  --text-primary: #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --lime: #c3fb03;
+  --lime-hover: #cffc35;
+  --contrast: #2f89f4;
+  --danger: #e8384f;
+  --line: rgba(255, 255, 255, 0.1);
+  /* encre des styles BD (.pi-*) */
+  --ink: #0a0a0f;
+}
+
+@theme inline {
+  --color-background: var(--bg-primary);
+  --color-surface: var(--bg-secondary);
+  --color-panel: var(--bg-card);
+  --color-foreground: var(--text-primary);
+  --color-muted: var(--text-secondary);
+  --color-subtle: var(--text-muted);
+  --color-lime: var(--lime);
+  --color-lime-hover: var(--lime-hover);
+  --color-contrast: var(--contrast);
+  --color-danger: var(--danger);
+  --color-border: var(--line);
+  --font-sans: var(--font-fredoka), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-baumans), var(--font-fredoka), sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+  }
+  /* Focus clavier visible sur un site sombre de bout en bout. */
+  :focus-visible {
+    outline: 2px solid var(--lime);
+    outline-offset: 3px;
+  }
+}
+
+/* Baumans n'a qu'une graisse (400) : jamais de bold, le faux gras passe par un trait. */
+@utility font-display-stroke {
+  font-family: var(--font-display);
+  font-weight: 400;
+  -webkit-text-stroke: 0.6px currentColor;
+}
+
+/* Squircle (repli Firefox). */
+@utility corner-shape-scircle {
+  corner-shape: squircle;
+}
+@supports (-moz-appearance: none) {
+  .corner-shape-scircle {
+    border-radius: 24px;
+  }
+}
+
+/* ── Fond et panneaux ─────────────────────────────────────────────────── */
+.noise-bg {
+  background-color: var(--bg-primary);
+  background-image: radial-gradient(ellipse at 50% 38%, #14141f 0%, #0a0a0f 72%);
+}
+
+/* Panneau vitré : fond sombre translucide, filet d'accent, halo (accent = --rarity). */
+.noise-panel {
+  border-radius: 24px;
+  border: 1px solid color-mix(in srgb, var(--rarity, #c3fb03) 60%, transparent);
+  background: rgba(10, 10, 15, 0.8);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.5),
+    0 0 40px -12px color-mix(in srgb, var(--rarity, #c3fb03) 45%, transparent);
+}
+
+/* Grain de film animé par pas (multiply sur le lime, screen sur le sombre). */
+.cta-noise {
+  overflow: hidden;
+  isolation: isolate;
+}
+.cta-noise::after {
+  content: "";
+  position: absolute;
+  inset: -100%;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 120px 120px;
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+  animation: cta-grain 0.9s steps(1) infinite;
+}
+.cta-noise--light::after {
+  mix-blend-mode: screen;
+  opacity: 0.16;
+}
+@keyframes cta-grain {
+  0% { transform: translate(0, 0); }
+  12.5% { transform: translate(-3%, 2%); }
+  25% { transform: translate(2%, -4%); }
+  37.5% { transform: translate(-4%, -2%); }
+  50% { transform: translate(3%, 3%); }
+  62.5% { transform: translate(-2%, 4%); }
+  75% { transform: translate(4%, -1%); }
+  87.5% { transform: translate(-1%, -3%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ── HUD de jeu (/character) : cadre à filet blanc dégradé, plaque de titre inclinée ── */
+.hud-frame {
+  padding: 1px;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.16) 45%, rgba(255, 255, 255, 0.06));
+}
+.hud-frame > .hud-fill {
+  background: rgba(28, 29, 34, 0.95);
+}
+.hud-tab {
+  position: relative;
+  transform: skewX(-14deg);
+}
+.hud-tab > * {
+  transform: skewX(14deg);
+}
+.hud-tab::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: 10px;
+  height: 10px;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(160deg, #ffffff 0%, #f0f2f8 55%, #d4d8e2 100%);
+  box-shadow:
+    -5px 5px 0 var(--hud-rim, #c3fb03),
+    5px 5px 0 var(--hud-rim, #c3fb03);
+}
+.hud-leader {
+  height: 1px;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.22) 0 2px, transparent 2px 5px);
+}
+
+/* ── Carte des quêtes (/projects) : parchemin, tome sombre, filets ── */
+@layer components {
+  .qm-hud {
+    --qm-paper: #f2ead8;
+    --qm-paper-2: #e6dbc1;
+    --qm-paper-3: #d6c7a4;
+    --qm-ink: #2e2820;
+    --qm-ink-2: #5d5446;
+    --qm-ink-3: #8a7f6c;
+    --qm-rule: rgba(62, 48, 28, 0.17);
+    --qm-edge: rgba(70, 54, 32, 0.34);
+    --qm-green: #c3fb03;
+    --qm-olive: #5c7a05;
+    --qm-night-1: #eceef2;
+    --qm-night-2: #b3b8c2;
+    --qm-night-3: #858b97;
+    --qm-night-rule: rgba(255, 255, 255, 0.1);
+  }
+
+  .qm-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+  }
+
+  .qm-paper {
+    color: var(--qm-ink);
+    border: 1px solid var(--qm-edge);
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.33 0 0 0 0 0.24 0 0 0 0 0.12 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+      radial-gradient(120% 90% at 50% 0%, transparent 60%, rgba(120, 92, 50, 0.16) 100%),
+      linear-gradient(175deg, var(--qm-paper), var(--qm-paper-2));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      inset 0 0 18px rgba(120, 92, 50, 0.12),
+      0 2px 4px rgba(20, 14, 6, 0.18),
+      0 16px 32px -14px rgba(20, 14, 6, 0.55);
+  }
+
+  .qm-tome {
+    color: var(--qm-night-2);
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+      linear-gradient(160deg, rgba(38, 39, 45, 0.95) 0%, rgba(16, 17, 21, 0.97) 100%);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.55),
+      0 26px 54px -20px rgba(0, 0, 0, 0.8),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 0 0 1px var(--qm-night-rule);
+  }
+
+  .qm-rule {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    --qm-rule-line: var(--qm-edge);
+  }
+  .qm-rule::before,
+  .qm-rule::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--qm-rule-line));
+  }
+  .qm-rule::after {
+    background: linear-gradient(90deg, var(--qm-rule-line), transparent);
+  }
+  .qm-rule > i {
+    width: 0.38rem;
+    height: 0.38rem;
+    rotate: 45deg;
+    border: 1px solid currentColor;
+  }
+}
+
+/* ── BD « punk » (/projects/[slug]) : boutons à ombre dure, autocollants, bande ── */
+.pi-btn {
+  --issue: var(--lime);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  padding: 0 1.6rem;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 4px 4px 0 var(--issue);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+.pi-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--issue);
+}
+.pi-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--issue);
+}
+.pi-btn--main {
+  --issue: #fff;
+  background: var(--lime);
+  border-color: var(--lime);
+  color: var(--ink);
+}
+.pi-btn:disabled {
+  opacity: 0.6;
+  transform: none;
+}
+
+.pi-sticker {
+  background: #fff;
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: 26%;
+  box-shadow: 5px 6px 0 var(--ink);
+  transform: rotate(var(--rot, 0deg));
+}
+
+.pi-tape {
+  background: var(--lime);
+  color: var(--ink);
+  border-block: 3px solid var(--ink);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  transform: rotate(-2.5deg);
+}
+
+/* ── Combat : étiquettes ancrées (DOM projeté par TagProjector), aperçus, chiffres de dégâts ── */
+/* Hors écran jusqu'à la première projection (style inline posé par le canvas). */
+.gd-anchor {
+  transform: translate(-9999px, -9999px);
+  will-change: transform;
+}
+.gd-tag {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  pointer-events: none;
+  user-select: none;
+}
+.gd-intent {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 6px 1px 5px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: 700 12px/1.1 var(--font-mono);
+  box-shadow: 2px 2px 0 var(--ink);
+  white-space: nowrap;
+}
+.gd-intent b {
+  color: var(--danger);
+}
+.gd-intent--reproduce {
+  background: var(--lime);
+}
+.gd-hp {
+  display: block;
+  width: 34px;
+  height: 5px;
+  border: 1.5px solid var(--ink);
+  border-radius: 3px;
+  background: #3a2e5c;
+  overflow: hidden;
+}
+.gd-hp > span {
+  display: block;
+  height: 100%;
+  background: var(--tag, var(--danger));
+  transition: width 0.25s ease-out;
+}
+.gd-preview {
+  display: inline-block;
+  padding: 0 6px;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  background: var(--lime);
+  color: var(--ink);
+  font: 700 14px/1.3 var(--font-mono);
+  box-shadow: 2px 2px 0 var(--ink);
+  pointer-events: none;
+}
+.gd-preview--hero {
+  background: var(--danger);
+  color: #fff;
+}
+/* Chiffre de dégâts : rebond (dépassement), puis montée et fondu. */
+.gd-pop {
+  display: inline-block;
+  font: 400 var(--pop-size, 22px) / 1 var(--font-display);
+  color: var(--pop-color, #fff);
+  -webkit-text-stroke: 4px var(--ink);
+  paint-order: stroke fill;
+  pointer-events: none;
+  animation: gd-pop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes gd-pop {
+  0% { transform: translateY(6px) scale(0.3); opacity: 0; }
+  18% { transform: translateY(-6px) scale(1.25); opacity: 1; }
+  32% { transform: translateY(-8px) scale(1); }
+  100% { transform: translateY(-34px) scale(0.95); opacity: 0; }
+}
+
+/* Rive épinglé sur l'UI (src/components/fx/RiveIcon.tsx). */
+.rive-icon {
+  display: inline-block;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gd-pop {
+    animation: gd-pop-still 1.2s linear forwards;
+  }
+  @keyframes gd-pop-still {
+    0%, 85% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  .cta-noise::after {
+    animation: none;
+  }
+  .pi-btn {
+    transition: none;
+  }
+}

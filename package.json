@@ -2,26 +2,53 @@
   "name": "git-dungeon",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "fixture": "tsx --env-file-if-exists=.env.local scripts/freeze-fixture.ts",
+    "kit:build": "node scripts/blender/dungeon-kit/run-blender.mjs build.py",
+    "kit:preview": "node scripts/blender/dungeon-kit/run-blender.mjs preview.py",
+    "kit:finish": "node scripts/blender/dungeon-kit/finish.mjs",
+    "kit:chars": "node scripts/blender/dungeon-kit/run-blender.mjs characters.py && node scripts/blender/dungeon-kit/finish.mjs characters",
+    "kit": "pnpm kit:build && pnpm kit:finish && pnpm kit:chars"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.1",
+    "@react-three/postprocessing": "3.1.3",
+    "@rive-app/react-canvas": "4.36.0",
+    "gsap": "^3.15.0",
     "next": "16.4.0",
+    "postprocessing": "6.39.5",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "three": "~0.186.1",
+    "zod": "^4.6.5",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@gltf-transform/cli": "^4.5.1",
     "@tailwindcss/turbopack": "^4",
-    "@types/node": "^20",
+    "@types/node": "^22.20.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.186.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
+    "fast-check": "^4.10.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.0.3"
   },
   "packageManager": "pnpm@10.18.2"
 }
